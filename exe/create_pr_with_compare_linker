@@ -1,0 +1,76 @@
+#!/usr/bin/env ruby
+
+require 'compare_linker'
+require 'git'
+require 'octokit'
+
+# TODO: option parser instead ENV
+unless ENV['OCTOKIT_ACCESS_TOKEN']
+  puts "ENV['OCTOKIT_ACCESS_TOKEN'] is required. Abort."
+  exit(false)
+end
+
+unless ENV['REPO_NAME']
+  puts "ENV['REPO_NAME'] is required. Abort."
+  exit(false)
+end
+
+unless ENV['PR_BODY_FILE']
+  puts "ENV['PR_BODY_FILE'] is required. Abort."
+  exit(false)
+end
+
+current_dir = Dir.pwd
+print "Create PR for '#{current_dir}' (Ctrl-C for Cancel) :"
+gets
+
+branch_name    = 'bundle_update_' + Date.today.strftime('%Y_%m_%d')
+commit_message = 'bundle update ' + Date.today.strftime("%Y.%m.%d")
+repo_name      = ENV['REPO_NAME']
+pr_title       = commit_message
+pr_body        = File.read(ENV['PR_BODY_FILE'])
+
+puts "Stash"
+puts `git stash`
+
+local = Git.open(current_dir)
+
+puts "Checkout master & pull"
+local.branch('master').checkout()
+local.pull()
+
+puts "Create '#{branch_name}' branch in local"
+local.branch(branch_name).checkout()
+
+puts "Exec bundle update..."
+puts `bundle update`
+puts 'bundle update Done.'
+puts
+puts "Commit as '#{commit_message}'"
+local.add(['Gemfile', 'Gemfile.lock'])
+local.commit(commit_message)
+
+print "Push '#{branch_name}' to origin ? (Ctrl-C for Cancel) :"
+gets
+
+puts "Push to remote"
+local.push('origin', branch_name)
+
+remote = Octokit::Client.new(access_token: ENV['OCTOKIT_ACCESS_TOKEN'])
+
+print 'Create PR ? (Ctrl-C for Cancel) :'
+gets
+
+puts "Create PR"
+pr = remote.create_pull_request(repo_name, 'master', branch_name, pr_title, pr_body)
+
+puts "#{pr[:html_url]} was created."
+print 'Exec compare linker ? (Ctrl-C for Cancel) :'
+gets
+
+puts "Exec compare_linker"
+compare_linker = CompareLinker.new(repo_name, pr.number)
+compare_linker.formatter = CompareLinker::Formatter::Markdown.new
+comment = compare_linker.make_compare_links.to_a.join("\n")
+compare_linker.add_comment(repo_name, pr.number, comment)
+puts 'All Done.'
