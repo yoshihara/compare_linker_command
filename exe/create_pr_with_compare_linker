@@ -22,7 +22,7 @@ end
 
 current_dir = Dir.pwd
 $stdout.print "Create PR for '#{current_dir}' (Ctrl-C for Cancel) :"
-gets
+$stdin.gets
 
 branch_name    = "bundle_update_" + Date.today.strftime("%Y_%m_%d")
 commit_message = "bundle update " + Date.today.strftime("%Y.%m.%d")
@@ -51,7 +51,7 @@ local.add(["Gemfile", "Gemfile.lock"])
 local.commit(commit_message)
 
 $stdout.print "Push '#{branch_name}' to origin ? (Ctrl-C for Cancel) :"
-gets
+$stdin.gets
 
 $stdout.puts "Push to remote"
 local.push("origin", branch_name)
@@ -59,14 +59,14 @@ local.push("origin", branch_name)
 remote = Octokit::Client.new(access_token: ENV["GITHUB_ACCESS_TOKEN"])
 
 $stdout.print "Create PR ? (Ctrl-C for Cancel) :"
-gets
+$stdin.gets
 
 $stdout.puts "Create PR"
 pr = remote.create_pull_request(repo_name, "master", branch_name, pr_title, pr_body)
 
 $stdout.puts "#{pr[:html_url]} was created."
 $stdout.print "Exec compare linker ? (Ctrl-C for Cancel) :"
-gets
+$stdin.gets
 
 $stdout.puts "Exec compare_linker"
 compare_linker = CompareLinker.new(repo_name, pr.number)
