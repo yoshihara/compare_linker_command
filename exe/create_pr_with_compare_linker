@@ -3,20 +3,39 @@
 require "compare_linker"
 require "git"
 require "octokit"
+require "optparse"
 
-# TODO: option parser instead ENV
-unless ENV["GITHUB_ACCESS_TOKEN"]
-  $stderr.puts "ENV['GITHUB_ACCESS_TOKEN'] is required. Abort."
+op = OptionParser.new
+params = {}
+
+op.on("", "--github-access-token TOKEN", "GitHub token for access") do |v|
+  params[:token] = v
+end
+
+op.on("", "--repo-name NAME", "org/repository for bundle update") do |v|
+  params[:repo_name] = v
+end
+
+op.on("", "--pr-body-file FILEPATH", "file path of description for bundle update PR") do |v|
+  params[:pr_body_file] = v
+end
+
+begin
+  op.parse(ARGV)
+rescue OptionParser::InvalidOption => e
+  $stderr.puts e.message
+  $stderr.puts op
+end
+
+unless params[:token]
+  $stderr.puts "--github-access-token is required. Abort.\n\n"
+  $stderr.puts op
   exit(false)
 end
 
-unless ENV["REPO_NAME"]
-  $stderr.puts "ENV['REPO_NAME'] is required. Abort."
-  exit(false)
-end
-
-unless ENV["PR_BODY_FILE"]
-  $stderr.puts "ENV['PR_BODY_FILE'] is required. Abort."
+unless params[:repo_name]
+  $stderr.puts "--repo-name is required. Abort.\n"
+  $stderr.puts op
   exit(false)
 end
 
@@ -26,9 +45,9 @@ $stdin.gets
 
 branch_name    = "bundle_update_" + Date.today.strftime("%Y_%m_%d")
 commit_message = "bundle update " + Date.today.strftime("%Y.%m.%d")
-repo_name      = ENV["REPO_NAME"]
+repo_name      = params[:repo_name]
 pr_title       = commit_message
-pr_body        = File.read(ENV["PR_BODY_FILE"])
+pr_body        = params[:pr_body_file] ? File.read(params[:pr_body_file]) : ""
 
 $stdout.puts "Stash"
 $stdout.puts `git stash`
@@ -56,7 +75,7 @@ $stdin.gets
 $stdout.puts "Push to remote"
 local.push("origin", branch_name)
 
-remote = Octokit::Client.new(access_token: ENV["GITHUB_ACCESS_TOKEN"])
+remote = Octokit::Client.new(access_token: params[:token])
 
 $stdout.print "Create PR ? (Ctrl-C for Cancel) :"
 $stdin.gets
