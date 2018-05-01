@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "compare_linker_command"
   spec.version       = CompareLinkerCommand::VERSION
   spec.authors       = ["yoshihara"]
-  spec.email         = ["yoshihara@users.noreply.github.com"]
+  spec.email         = ["yshr04hrk@gmail.com"]
 
   spec.summary       = "compare linker command"
   spec.description   = "compare linker command"
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/yoshihara/compare_linker_command"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
