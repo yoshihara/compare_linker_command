@@ -6,6 +6,9 @@ require "octokit"
 require "optparse"
 
 op = OptionParser.new
+op.program_name = "create_pr_with_compare_linker"
+op.version = "0.0.1"
+
 params = {}
 
 op.on("", "--github-access-token TOKEN", "GitHub token for access") do |v|
