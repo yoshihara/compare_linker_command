@@ -3,42 +3,11 @@
 require "compare_linker"
 require "git"
 require "octokit"
-require "optparse"
+require "compare_linker_command"
 
-op = OptionParser.new
-op.program_name = "create_pr_with_compare_linker"
-op.version = "0.0.1"
+params = CompareLinkerCommand::Parser.parse(ARGV)
 
-params = {}
-
-op.on("", "--github-access-token TOKEN", "GitHub token for access") do |v|
-  params[:token] = v
-end
-
-op.on("", "--repo-name NAME", "org/repository for bundle update") do |v|
-  params[:repo_name] = v
-end
-
-op.on("", "--pr-body-file FILEPATH", "file path of description for bundle update PR") do |v|
-  params[:pr_body_file] = v
-end
-
-begin
-  op.parse(ARGV)
-rescue OptionParser::InvalidOption => e
-  $stderr.puts e.message
-  $stderr.puts op
-end
-
-unless params[:token]
-  $stderr.puts "--github-access-token is required. Abort.\n\n"
-  $stderr.puts op
-  exit(false)
-end
-
-unless params[:repo_name]
-  $stderr.puts "--repo-name is required. Abort.\n"
-  $stderr.puts op
+unless params[:succeeded]
   exit(false)
 end
 
