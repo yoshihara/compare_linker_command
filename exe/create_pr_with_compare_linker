@@ -5,8 +5,8 @@ require 'git'
 require 'octokit'
 
 # TODO: option parser instead ENV
-unless ENV['OCTOKIT_ACCESS_TOKEN']
-  puts "ENV['OCTOKIT_ACCESS_TOKEN'] is required. Abort."
+unless ENV['GITHUB_ACCESS_TOKEN']
+  puts "ENV['GITHUB_ACCESS_TOKEN'] is required. Abort."
   exit(false)
 end
 
@@ -56,7 +56,7 @@ gets
 puts "Push to remote"
 local.push('origin', branch_name)
 
-remote = Octokit::Client.new(access_token: ENV['OCTOKIT_ACCESS_TOKEN'])
+remote = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
 
 print 'Create PR ? (Ctrl-C for Cancel) :'
 gets
