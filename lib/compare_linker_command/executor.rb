@@ -22,7 +22,6 @@ module CompareLinkerCommand
       $stdout.puts "Stash"
       $stdout.puts `git stash`
 
-
       $stdout.puts "Checkout master & pull"
       @local.branch("master").checkout()
       @local.pull()
