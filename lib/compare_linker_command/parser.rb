@@ -28,6 +28,10 @@ module CompareLinkerCommand
         params[:pr_body_file] = v
       end
 
+      @op.on("", "--pr-number [number]", "PR number. When this option is specified, this command runs compare-linker only.") do |v|
+        params[:pr_number] = v.to_s.gsub(/^#/, "")
+      end
+
       error_message = ""
 
       begin
