@@ -5,6 +5,8 @@ require "octokit"
 module CompareLinkerCommand
   class Executor
     def initialize(current_dir, params)
+      @current_dir = current_dir
+
       @repo_name = params[:repo_name]
       @pr_body = params[:pr_body_file] ? File.read(params[:pr_body_file]) : ""
 
@@ -15,6 +17,9 @@ module CompareLinkerCommand
     end
 
     def exec
+      $stdout.print "Create PR for '#{@current_dir}' (Ctrl-C for Cancel) :"
+      $stdin.gets
+
       branch_name    = "bundle_update_" + Date.today.strftime("%Y_%m_%d")
       commit_message = "bundle update " + Date.today.strftime("%Y.%m.%d")
       pr_title       = commit_message

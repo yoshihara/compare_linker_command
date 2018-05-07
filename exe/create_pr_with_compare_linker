@@ -18,8 +18,5 @@ if params[:pr_number]
 
   command.run_compare_linker(pr_number)
 else
-  $stdout.print "Create PR for '#{current_dir}' (Ctrl-C for Cancel) :"
-  $stdin.gets
-
   command.exec
 end
