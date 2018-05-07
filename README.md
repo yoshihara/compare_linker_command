@@ -1,28 +1,38 @@
 # CompareLinkerCommand
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/compare_linker_command`. To experiment with that code, run `bin/console` for an interactive prompt.
+次のことを自動で行うコマンドです。
 
-TODO: Delete this and the text above, and describe your gem
+1. bundle update
+2. Create PR
+3. Compare Linker
+
+オプションでPR番号を指定することで、既存のPRに対してCompareLinkerのみ実行することができます。
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'compare_linker_command'
+```console
+$ gem install compare_linker_command
 ```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install compare_linker_command
 
 ## Usage
 
-TODO: Write usage instructions here
+### normal:
+
+```consome
+$ create_pr_with_compare_linker \
+  --github-access-token YOUR_TOKEN \
+  --repo-name ORG/REPOSITORY \
+  --pr-body-file FILE_CONTAINING_PR_DESCRIPTION_CONTENT(optional)
+```
+
+### Compare Linker only:
+
+```consome
+$ create_pr_with_compare_linker \
+  --github-access-token YOUR_TOKEN \
+  --repo-name ORG/REPOSITORY \
+  --pr-number TARGET_PR_NUMBER
+```
 
 ## Development
 
