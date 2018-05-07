@@ -7,10 +7,9 @@ module CompareLinkerCommand
     def initialize(current_dir, params)
       @repo_name = params[:repo_name]
       @pr_body = params[:pr_body_file] ? File.read(params[:pr_body_file]) : ""
-      @token = params[:token]
 
-      # TODO: local/remoteをここで生成する
       @local = Git.open(current_dir)
+      @remote = Octokit::Client.new(access_token: params[:token])
     end
 
     def exec
@@ -43,13 +42,11 @@ module CompareLinkerCommand
       $stdout.puts "Push to remote"
       @local.push("origin", branch_name)
 
-      remote = Octokit::Client.new(access_token: @token)
-
       $stdout.print "Create PR ? (Ctrl-C for Cancel) :"
       $stdin.gets
 
       $stdout.puts "Create PR"
-      pr = remote.create_pull_request(@repo_name, "master", branch_name, pr_title, @pr_body)
+      pr = @remote.create_pull_request(@repo_name, "master", branch_name, pr_title, @pr_body)
 
       $stdout.puts "#{pr[:html_url]} was created."
 
