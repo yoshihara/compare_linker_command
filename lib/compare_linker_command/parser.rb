@@ -24,7 +24,7 @@ module CompareLinkerCommand
         params[:repo_name] = v
       end
 
-      @op.on("", "--pr-body-file FILEPATH", "file path of description for bundle update PR") do |v|
+      @op.on("", "--pr-body-file [FILEPATH]", "file path of description for bundle update PR (default: empty file)") do |v|
         params[:pr_body_file] = v
       end
 
