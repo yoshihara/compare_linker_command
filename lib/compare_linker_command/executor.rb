@@ -5,12 +5,12 @@ require "octokit"
 module CompareLinkerCommand
   class Executor
     def initialize(current_dir, params)
-      @current_dir = current_dir
       @repo_name = params[:repo_name]
       @pr_body = params[:pr_body_file] ? File.read(params[:pr_body_file]) : ""
       @token = params[:token]
 
       # TODO: local/remoteをここで生成する
+      @local = Git.open(current_dir)
     end
 
     def exec
@@ -21,28 +21,27 @@ module CompareLinkerCommand
       $stdout.puts "Stash"
       $stdout.puts `git stash`
 
-      local = Git.open(@current_dir)
 
       $stdout.puts "Checkout master & pull"
-      local.branch("master").checkout()
-      local.pull()
+      @local.branch("master").checkout()
+      @local.pull()
 
       $stdout.puts "Create '#{branch_name}' branch in local"
-      local.branch(branch_name).checkout()
+      @local.branch(branch_name).checkout()
 
       $stdout.puts "Exec bundle update..."
       $stdout.puts `bundle update`
       $stdout.puts "bundle update Done."
       $stdout.puts
       $stdout.puts "Commit as '#{commit_message}'"
-      local.add(["Gemfile", "Gemfile.lock"])
-      local.commit(commit_message)
+      @local.add(["Gemfile", "Gemfile.lock"])
+      @local.commit(commit_message)
 
       $stdout.print "Push '#{branch_name}' to origin ? (Ctrl-C for Cancel) :"
       $stdin.gets
 
       $stdout.puts "Push to remote"
-      local.push("origin", branch_name)
+      @local.push("origin", branch_name)
 
       remote = Octokit::Client.new(access_token: @token)
 
