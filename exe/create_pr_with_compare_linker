@@ -12,11 +12,7 @@ current_dir = Dir.pwd
 command = CompareLinkerCommand::Executor.new(current_dir, params)
 
 if params[:pr_number]
-  pr_number = params[:pr_number]
-  $stdout.print "Run compare-linker for '#{params[:repo_name]}##{pr_number}' (Ctrl-C for Cancel) :"
-  $stdin.gets
-
-  command.run_compare_linker(pr_number)
+  command.run_compare_linker(params[:pr_number])
 else
   command.exec
 end

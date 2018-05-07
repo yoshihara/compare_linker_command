@@ -56,9 +56,6 @@ module CompareLinkerCommand
 
       $stdout.puts "#{pr[:html_url]} was created."
 
-      $stdout.print "Exec compare linker ? (Ctrl-C for Cancel) :"
-      $stdin.gets
-
       run_compare_linker(pr.number)
 
       $stdout.puts "All Done."
@@ -69,7 +66,8 @@ module CompareLinkerCommand
       # c.f. https://github.com/masutaka/compare_linker/blob/234719c8e679fa59afa767fd149d2ca7ee51e5d3/lib/compare_linker.rb#L18
       ENV["OCTOKIT_ACCESS_TOKEN"] = @token
 
-      $stdout.puts "Exec compare_linker"
+      $stdout.print "Run compare-linker for '#{@repo_name}##{pr_number}' (Ctrl-C for Cancel) :"
+      $stdin.gets
 
       compare_linker = CompareLinker.new(@repo_name, pr_number)
       compare_linker.formatter = CompareLinker::Formatter::Markdown.new
