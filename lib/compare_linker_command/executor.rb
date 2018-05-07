@@ -9,7 +9,9 @@ module CompareLinkerCommand
       @pr_body = params[:pr_body_file] ? File.read(params[:pr_body_file]) : ""
 
       @local = Git.open(current_dir)
-      @remote = Octokit::Client.new(access_token: params[:token])
+
+      @token = params[:token]
+      @remote = Octokit::Client.new(access_token: @token)
     end
 
     def exec
@@ -59,7 +61,12 @@ module CompareLinkerCommand
     end
 
     def run_compare_linker(pr_number)
+      # NOTE: CompareLinker requires ENV["OCTOKIT_ACCESS_TOKEN"]
+      # c.f. https://github.com/masutaka/compare_linker/blob/234719c8e679fa59afa767fd149d2ca7ee51e5d3/lib/compare_linker.rb#L18
+      ENV["OCTOKIT_ACCESS_TOKEN"] = @token
+
       $stdout.puts "Exec compare_linker"
+
       compare_linker = CompareLinker.new(@repo_name, pr_number)
       compare_linker.formatter = CompareLinker::Formatter::Markdown.new
       comment = compare_linker.make_compare_links.to_a.join("\n")
